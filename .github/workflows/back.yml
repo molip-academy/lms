@@ -52,6 +52,10 @@ jobs:
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
+    # railway.json 이 back/ 에 있고 Dockerfile 경로도 back/ 기준이다.
+    defaults:
+      run:
+        working-directory: back
 
     steps:
       - uses: actions/checkout@v5
@@ -61,6 +65,7 @@ jobs:
 
       # Railway 의 GitHub 자동 연동은 쓰지 않는다. 그쪽은 이 test gate 를 우회하기 때문이다.
       - name: Deploy to Railway
-        run: railway up --service "${{ vars.RAILWAY_SERVICE || 'back' }}" --ci
+        run: railway up --service back --ci
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ab71aadc-0edc-4402-a3d3-b65ff3e72589
