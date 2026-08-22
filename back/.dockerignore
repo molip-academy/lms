@@ -1,0 +1,6 @@
+build/
+.gradle/
+*.mv.db
+*.trace.db
+.idea/
+.kotlin/

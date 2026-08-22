@@ -1,0 +1,81 @@
+name: front
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'front-react/**'
+      - '.github/workflows/front.yml'
+  pull_request:
+    paths:
+      - 'front-react/**'
+      - '.github/workflows/front.yml'
+
+concurrency:
+  group: front-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front-react
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: front-react/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # tsc 가 build 안에 포함되어 있어 타입 오류도 여기서 걸린다.
+      - name: Build
+        run: npm run build
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v5
+        with:
+          name: front-dist
+          path: front-react/dist
+          retention-days: 1
+
+  deploy:
+    name: deploy
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: front-react/package-lock.json
+
+      - run: npm ci
+        working-directory: front-react
+
+      - name: Download dist
+        uses: actions/download-artifact@v5
+        with:
+          name: front-dist
+          path: front-react/dist
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: front-react
+          command: deploy

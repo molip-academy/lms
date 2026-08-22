@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "molip-academy-lms",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-08-01",
+
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // SPA 이므로 없는 경로는 index.html 로 되돌린다.
+    "not_found_handling": "single-page-application",
+    // asset 조회보다 Worker 를 먼저 태워야 /api/* 가 SPA fallback 에 먹히지 않는다.
+    "run_worker_first": ["/api/*"]
+  },
+
+  "vars": {
+    // 비밀이 아니다. Railway 배포 후 실제 URL 로 바꾼다.
+    "BACKEND_URL": "https://REPLACE-ME.up.railway.app"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

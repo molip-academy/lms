@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: back
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${PORT:8080}
+
+jwt:
+  # 운영에서는 반드시 JWT_SECRET 환경변수로 덮어쓴다.
+  secret: ${JWT_SECRET:molip-academy-lms-local-development-secret-key-do-not-use-in-production}
+  expiration-seconds: 604800
+  cookie-name: token
+  # http://localhost 에서는 Secure cookie 가 붙지 않으므로 dev/test 는 false 로 둔다.
+  cookie-secure: false
