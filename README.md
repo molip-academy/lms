@@ -1,5 +1,12 @@
 # MOLIP Academy LMS
 
+| 환경 | URL |
+| --- | --- |
+| web | https://molip-academy-lms.jangka512.workers.dev |
+| api | https://back-production-cbf2.up.railway.app (Railway, Southeast Asia) |
+
+`/api/*` 는 Cloudflare Worker 가 Railway 로 넘기므로, front 에서는 same-origin 으로 보인다.
+
 ## Repository structure
 
 | Directory | Stack | Target |
@@ -77,7 +84,12 @@ Cloudflare Worker 가 `/api/*` 를 Railway 로 proxy 해서 front 와 API 를 �
 
 **`front-react/wrangler.jsonc`**
 
-`vars.BACKEND_URL` 을 Railway 가 발급한 실제 URL 로 바꾼다. 비밀이 아니므로 평문으로 둔다.
+`vars.BACKEND_URL` 은 이미 실제 Railway URL 로 설정되어 있다. 비밀이 아니므로 평문으로 둔다.
+
+> **주의**: `back` 서비스는 반드시 **replica 1개**로 유지한다.
+> H2 file DB 는 컨테이너 로컬 파일이므로 replica 가 2개 이상이면 각자 다른 DB 를 갖게 되어
+> 로그인한 회원이 요청마다 사라지는 것처럼 보인다.
+> `railway service scale --service back southeast-asia=1` 로 확인한다.
 
 > **운영 DB 주의**: 운영도 volume 없는 H2 file DB 라서 **재배포마다 데이터가 전부 사라지고**
 > sample data 가 다시 깔린다. 의도된 선택이며 이유는
