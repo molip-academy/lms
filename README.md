@@ -69,18 +69,22 @@ Cloudflare Worker 가 `/api/*` 를 Railway 로 proxy 해서 front 와 API 를 �
 
 **GitHub repository secrets**
 
-| 이름 | 용도 |
-| --- | --- |
-| `RAILWAY_TOKEN` | Railway 배포 |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare Workers 배포 |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare 계정 식별 |
+`CLOUDFLARE_ACCOUNT_ID` 는 이미 등록되어 있다(비밀이 아니다). 남은 두 개는 토큰이므로 직접 발급해 등록한다.
+
+```bash
+gh secret set CLOUDFLARE_API_TOKEN   # Cloudflare 대시보드 > API 토큰 > "Edit Cloudflare Workers" 템플릿
+gh secret set RAILWAY_TOKEN          # Railway > 계정 설정 > 토큰
+```
+
+등록 전까지 `back` / `front` workflow 의 test·build job 은 통과하고 deploy job 만 실패한다.
+운영 서비스 자체는 이미 배포되어 동작 중이다.
 
 **Railway 환경변수**
 
-| 이름 | 값 |
-| --- | --- |
-| `JWT_SECRET` | 32자 이상의 임의 문자열 |
-| `SPRING_PROFILES_ACTIVE` | `prod` (Dockerfile 기본값) |
+| 이름 | 값 | 상태 |
+| --- | --- | --- |
+| `JWT_SECRET` | 32자 이상의 임의 문자열 | 설정 완료 |
+| `SPRING_PROFILES_ACTIVE` | `prod` | 설정 완료 |
 
 **`front-react/wrangler.jsonc`**
 
