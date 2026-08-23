@@ -79,15 +79,12 @@ jobs:
         run: npm install -g @railway/cli
 
       # Railway 의 GitHub 자동 연동은 쓰지 않는다. 그쪽은 이 test gate 를 우회하기 때문이다.
-      # Railway 는 token 종류에 따라 읽는 환경변수가 다르다.
-      #   project token  -> RAILWAY_TOKEN
-      #   account token  -> RAILWAY_API_TOKEN
-      # 어느 쪽을 발급했든 동작하도록 같은 secret 을 둘 다에 넣는다.
+      # Railway **project token** 을 쓴다 (프로젝트 설정 > Tokens 에서 발급).
+      # project token 은 프로젝트와 environment 에 이미 묶여 있으므로
+      # --project / --environment 를 줄 필요가 없다.
+      # 계정 토큰(Account settings > Tokens)은 변수 이름이 RAILWAY_API_TOKEN 으로 달라 동작하지 않는다.
       - name: Deploy to Railway
         if: steps.creds.outputs.ready == 'true'
-        run: railway up --service back --project "$RAILWAY_PROJECT_ID" --environment production --ci
+        run: railway up --service back --ci
         env:
-          # account token 을 쓴다. RAILWAY_TOKEN(project token)과 동시에 주면
-          # CLI 가 그쪽을 먼저 보고 Unauthorized 로 떨어진다.
-          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ab71aadc-0edc-4402-a3d3-b65ff3e72589
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
