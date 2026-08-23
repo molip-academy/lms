@@ -46,6 +46,26 @@ jobs:
           name: back-test-report
           path: back/build/reports/tests/test
 
-  # 배포는 Railway 의 GitHub 연동이 담당한다 (main push 시 자동).
-  # Railway 서비스 설정의 "Wait for CI" 를 켜두면 위 test job 이 통과해야 배포가 시작되므로,
-  # test gate 가 유지된다. 이 설정을 끄면 test 실패한 커밋도 배포된다.
+  deploy:
+    name: deploy
+    # test 가 배포 gate 다. 실패하면 배포하지 않는다.
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    # railway.json 이 back/ 에 있고 Dockerfile 경로도 back/ 기준이다.
+    defaults:
+      run:
+        working-directory: back
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      # Railway 의 GitHub 자동 연동은 쓰지 않는다. 그쪽은 이 test gate 를 우회하기 때문이다.
+      - name: Deploy to Railway
+        run: railway up --service back --ci
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: ab71aadc-0edc-4402-a3d3-b65ff3e72589

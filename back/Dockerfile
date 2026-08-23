@@ -1,8 +1,4 @@
 # syntax=docker/dockerfile:1
-#
-# 빌드 컨텍스트는 **repo 루트**다. Railway 의 GitHub 연동이 monorepo 루트를 컨텍스트로 넘기므로
-# COPY 경로에 back/ 접두사가 붙는다. 로컬에서 직접 빌드할 때도 루트에서 실행해야 한다:
-#   docker build -f back/Dockerfile .
 
 # ---- build ----
 # Railway 의 자동 빌더가 JDK 25 를 지원하지 않을 수 있어 toolchain 을 직접 못박는다.
@@ -10,12 +6,12 @@ FROM eclipse-temurin:25-jdk AS build
 WORKDIR /workspace
 
 # wrapper 와 build script 를 먼저 복사해 의존성 layer 를 캐시한다.
-COPY back/gradlew ./
-COPY back/gradle ./gradle
-COPY back/settings.gradle.kts back/build.gradle.kts ./
+COPY gradlew ./
+COPY gradle ./gradle
+COPY settings.gradle.kts build.gradle.kts ./
 RUN chmod +x gradlew && ./gradlew --no-daemon dependencies --quiet || true
 
-COPY back/src ./src
+COPY src ./src
 # 이미지 빌드 단계에서는 test 를 돌리지 않는다. test gate 는 GitHub Actions 가 담당한다.
 RUN ./gradlew --no-daemon clean bootJar -x test
 
