@@ -15,7 +15,7 @@
 
   "vars": {
     // 비밀이 아니다. Railway 배포 후 실제 URL 로 바꾼다.
-    "BACKEND_URL": "https://back-production-cbf2.up.railway.app"
+    "BACKEND_URL": "https://back-production-2687.up.railway.app"
   },
 
   "observability": {

@@ -2,8 +2,8 @@
 
 | 환경 | URL |
 | --- | --- |
-| web | https://molip-academy-lms.jangka512.workers.dev |
-| api | https://back-production-cbf2.up.railway.app (Railway, Southeast Asia) |
+| web | https://molip-academy-lms.molip-academy.workers.dev |
+| api | https://back-production-2687.up.railway.app (Railway, Southeast Asia) |
 
 `/api/*` 는 Cloudflare Worker 가 Railway 로 넘기므로, front 에서는 same-origin 으로 보인다.
 
