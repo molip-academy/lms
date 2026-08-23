@@ -1,12 +1,12 @@
 import { Link, Outlet, useNavigate } from "react-router"
-import { LogOut, Moon, PenLine, Sun, User } from "lucide-react"
+import { LogOut, Moon, PenLine, Sun, User, WifiOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useLogout, useMe } from "@/hooks/use-auth"
 import { useTheme } from "@/hooks/use-theme"
 
 export function Layout() {
-  const { member, isPending } = useMe()
+  const { member, isPending, isAuthUnknown } = useMe()
   const logout = useLogout()
   const { theme, toggle } = useTheme()
   const navigate = useNavigate()
@@ -31,6 +31,18 @@ export function Layout() {
 
             {isPending ? (
               <Skeleton className="h-8 w-24" />
+            ) : isAuthUnknown ? (
+              /*
+               * 연결이 끊기면 로그인 여부를 알 수 없다. 로그인/로그아웃 중 하나를 골라 보여주면
+               * 반드시 절반은 거짓말이 되므로, 둘 다 감추고 모른다는 사실만 표시한다.
+               */
+              <span
+                className="flex items-center gap-1.5 px-2 text-sm text-muted-foreground"
+                role="status"
+              >
+                <WifiOff className="size-4" />
+                오프라인
+              </span>
             ) : member ? (
               <>
                 <Button variant="ghost" size="sm" asChild>

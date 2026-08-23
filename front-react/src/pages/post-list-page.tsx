@@ -10,13 +10,14 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Skeleton } from "@/components/ui/skeleton"
+import { loadErrorMessage } from "@/lib/load-error"
 import { usePosts } from "@/hooks/use-posts"
 import { formatDate } from "@/lib/format"
 
 export function PostListPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Math.max(1, Number(searchParams.get("page") ?? 1))
-  const { data, isPending, isError } = usePosts(page)
+  const { data, isPending, isError, error } = usePosts(page)
 
   if (isPending) {
     return (
@@ -29,7 +30,11 @@ export function PostListPage() {
   }
 
   if (isError) {
-    return <p className="text-center text-muted-foreground">글 목록을 불러오지 못했습니다.</p>
+    return (
+      <p className="text-center text-muted-foreground">
+        {loadErrorMessage(error, "글 목록을 불러오지 못했습니다.")}
+      </p>
+    )
   }
 
   return (

@@ -9,14 +9,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      // 새 버전을 발견하면 바로 갈아치우지 않고 사용자에게 물어본다.
-      // 글을 쓰는 도중에 reload 되면 입력하던 내용이 날아가기 때문이다.
-      registerType: 'prompt',
-      // 등록은 PwaUpdatePrompt 가 useRegisterSW 로 직접 한다.
-      // 'auto' 로 두면 plugin 이 넣는 script 와 겹쳐 두 번 등록된다.
-      injectRegister: null,
+      // 새 버전을 찾으면 그냥 갈아끼운다. 물어보는 UI 도 만들어봤지만 근거가 없었다 —
+      // post-form-page 가 입력을 어디에도 저장하지 않아 지킬 초안 자체가 없고,
+      // 그래서 자동 reload 의 위험이 일반 새로고침과 다르지 않다.
+      registerType: 'autoUpdate',
 
-      // dev server 에서도 service worker 를 켜서 실제 동작을 확인할 수 있게 한다.
+      // service worker 는 build 산출물이라 dev server 에서는 켜지 않는다.
+      // 실제 동작은 `npm run build && npm run cf:dev` 로 확인한다.
       devOptions: { enabled: false },
 
       manifest: {
@@ -28,7 +27,8 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         background_color: '#ffffff',
-        theme_color: '#863bff',
+        // light 기준값이다. 실제 상태바 색은 use-theme 이 theme-color meta 를 갱신해 따라간다.
+        theme_color: '#ffffff',
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },

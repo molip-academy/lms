@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ApiError, api } from "@/lib/api"
+import { ApiError, NetworkError, api } from "@/lib/api"
 import type { Member } from "@/lib/types"
 
 export const ME_QUERY_KEY = ["me"] as const
@@ -28,6 +28,14 @@ export function useMe() {
     ...query,
     member: query.data ?? null,
     isLoggedIn: query.data != null,
+    /**
+     * 로그인 여부를 **판정할 수 없는** 상태다. "비로그인" 과 반드시 구분해야 한다.
+     *
+     * token 이 HttpOnly cookie 라 JS 는 서버에 물어보는 것 말고 로그인 여부를 알 방법이 없다.
+     * 연결이 끊기면 그 유일한 수단이 막히므로, 이때 비로그인으로 처리하면
+     * 로그인해 둔 사람에게 로그아웃된 것처럼 보인다.
+     */
+    isAuthUnknown: query.error instanceof NetworkError,
   }
 }
 

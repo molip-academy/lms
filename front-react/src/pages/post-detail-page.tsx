@@ -21,6 +21,7 @@ import { LikeButton } from "@/components/like-button"
 import { useMe } from "@/hooks/use-auth"
 import { useDeletePost, usePost, useTogglePostLike } from "@/hooks/use-posts"
 import { formatDateTime } from "@/lib/format"
+import { loadErrorMessage } from "@/lib/load-error"
 
 export function PostDetailPage() {
   const { id: rawId } = useParams<{ id: string }>()
@@ -28,7 +29,7 @@ export function PostDetailPage() {
   const navigate = useNavigate()
   const { isLoggedIn } = useMe()
 
-  const { data: post, isPending, isError } = usePost(id)
+  const { data: post, isPending, isError, error } = usePost(id)
   const toggleLike = useTogglePostLike(id)
   const remove = useDeletePost()
 
@@ -44,7 +45,9 @@ export function PostDetailPage() {
   if (isError || !post) {
     return (
       <div className="space-y-4 py-12 text-center">
-        <p className="text-muted-foreground">글을 찾을 수 없습니다.</p>
+        <p className="text-muted-foreground">
+          {loadErrorMessage(error, "글을 찾을 수 없습니다.")}
+        </p>
         <Button variant="outline" asChild>
           <Link to="/">목록으로</Link>
         </Button>

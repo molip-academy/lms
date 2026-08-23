@@ -24,6 +24,19 @@ export class ApiError extends Error {
 }
 
 /**
+ * 요청이 back 까지 닿지도 못한 경우다. `fetch` 는 이럴 때 TypeError 를 던지는데,
+ * 그대로 두면 응답이 온 실패(ApiError)와 구분할 수 없어 호출부가 전부 오판한다.
+ *
+ * PWA 로 설치하면 offline 에서 앱을 여는 일이 실제로 생기므로 별도 타입으로 세운다.
+ */
+export class NetworkError extends Error {
+  constructor() {
+    super("네트워크에 연결할 수 없습니다. 연결 상태를 확인해주세요.")
+    this.name = "NetworkError"
+  }
+}
+
+/**
  * 인증 token 은 HttpOnly cookie 라 JS 가 읽을 수 없다.
  * `credentials: "include"` 만 붙이면 브라우저가 알아서 실어 보낸다.
  *
@@ -31,11 +44,17 @@ export class ApiError extends Error {
  * 로컬에서는 Vite dev proxy 가 같은 역할을 한다 (ADR 0001).
  */
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`/api/v1${path}`, {
-    credentials: "include",
-    headers: init?.body ? { "Content-Type": "application/json" } : undefined,
-    ...init,
-  })
+  let response: Response
+  try {
+    response = await fetch(`/api/v1${path}`, {
+      credentials: "include",
+      headers: init?.body ? { "Content-Type": "application/json" } : undefined,
+      ...init,
+    })
+  } catch {
+    // fetch 가 던지는 건 연결 실패뿐이다. HTTP 에러는 아래에서 status 로 걸러진다.
+    throw new NetworkError()
+  }
 
   if (response.status === 204) return undefined as T
 

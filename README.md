@@ -13,7 +13,7 @@
 | --- | --- | --- |
 | `back/` | 코프링 (Kotlin + Spring Boot 4.1.1, JDK 25) | backend |
 | `front-react/` | Vite + React + Cloudflare Workers | web |
-| `front-kmp/` | KMP | Android, iOS (미착수) |
+| `front-kmp/` | KMP | Android, iOS (미착수 — 모바일 정식 경로, [ADR 0003](./docs/adr/0003-pwa-is-a-stopgap-until-kmp.md)) |
 | `infra/` | Terraform | infrastructure (미착수) |
 
 용어는 [CONTEXT.md](./CONTEXT.md)를, 되돌리기 어려운 결정은 [docs/adr/](./docs/adr/)을 참고한다.
@@ -59,8 +59,15 @@ app icon 은 `front-react/public/pwa-source.svg` 하나에서 생성한다. 로�
 cd front-react && npm run pwa:icons
 ```
 
-> `/api/*` 는 **캐시하지 않는다**. 인증된 응답을 캐시하면 로그아웃 뒤에도 남기 때문이다.
-> offline 에서는 화면(app shell)만 뜨고 목록·글 내용은 비어 보인다.
+offline 에서는 화면(app shell)만 뜨고 목록·글 내용은 비어 보인다. 헤더는 로그인/로그아웃
+대신 "오프라인" 을 표시한다 — token 이 `HttpOnly` cookie 라 연결이 끊기면 로그인 여부를
+**알 방법 자체가 없기 때문**이며, 둘 중 하나를 골라 보여주면 반드시 절반은 거짓이 된다.
+
+> `/api/*` 는 **캐시하지 않는다**. 인증된 응답이 캐시에 남으면 로그아웃 뒤에도 보이거나
+> 다른 계정에 새어나간다.
+>
+> 여기까지가 의도한 범위다. offline 읽기 캐시·push notification 을 넣지 않은 이유는
+> [ADR 0003](./docs/adr/0003-pwa-is-a-stopgap-until-kmp.md) 을 참고한다.
 
 ## 테스트
 
