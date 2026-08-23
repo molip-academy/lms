@@ -43,6 +43,25 @@ cd front-react && npm install && npm run dev
 | `admin` | ADMIN | 관리자 |
 | `user1` ~ `user4` | USER | 유저1 ~ 유저4 |
 
+### PWA
+
+web 은 설치 가능한 PWA 다. service worker 는 `vite-plugin-pwa` 가 build 때 생성하므로
+`npm run dev` 에서는 등록되지 않는다. 실제 동작은 build 결과로 확인한다.
+
+```bash
+cd front-react && npm run build && npm run cf:dev
+```
+
+app icon 은 `front-react/public/pwa-source.svg` 하나에서 생성한다. 로고를 바꾸면
+그 파일만 고치고 아래를 돌린 뒤, 새로 생긴 png 를 커밋한다.
+
+```bash
+cd front-react && npm run pwa:icons
+```
+
+> `/api/*` 는 **캐시하지 않는다**. 인증된 응답을 캐시하면 로그아웃 뒤에도 남기 때문이다.
+> offline 에서는 화면(app shell)만 뜨고 목록·글 내용은 비어 보인다.
+
 ## 테스트
 
 ```bash
