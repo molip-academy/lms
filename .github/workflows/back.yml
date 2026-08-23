@@ -87,6 +87,7 @@ jobs:
         if: steps.creds.outputs.ready == 'true'
         run: railway up --service back --project "$RAILWAY_PROJECT_ID" --environment production --ci
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          # account token 을 쓴다. RAILWAY_TOKEN(project token)과 동시에 주면
+          # CLI 가 그쪽을 먼저 보고 Unauthorized 로 떨어진다.
           RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ab71aadc-0edc-4402-a3d3-b65ff3e72589
