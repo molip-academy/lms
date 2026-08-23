@@ -60,11 +60,27 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # secret 이 없으면 배포를 건너뛴다. 없다고 CI 를 빨간불로 두면
+      # test 실패와 secret 미설정을 구분할 수 없게 된다.
+      - name: Check deploy credentials
+        id: creds
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          if [ -n "$RAILWAY_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=배포 건너뜀::RAILWAY_TOKEN secret 이 없어 Railway 배포를 건너뛴다. 등록하면 다음 push 부터 자동 배포된다."
+          fi
+
       - name: Install Railway CLI
+        if: steps.creds.outputs.ready == 'true'
         run: npm install -g @railway/cli
 
       # Railway 의 GitHub 자동 연동은 쓰지 않는다. 그쪽은 이 test gate 를 우회하기 때문이다.
       - name: Deploy to Railway
+        if: steps.creds.outputs.ready == 'true'
         run: railway up --service back --ci
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
