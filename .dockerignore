@@ -1,0 +1,13 @@
+**/node_modules
+**/build
+**/dist
+**/.gradle
+**/.kotlin
+**/*.mv.db
+**/*.trace.db
+.git
+.scratch
+front-react
+front-kmp
+infra
+docs
